@@ -1,16 +1,18 @@
 package elevator;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
+import lombok.Data;
+
+@Data
 public class Elevator {
 
     private Integer startFloor = 0;
-    private Set<Integer> floorsToVisit;
-
-    private Set<Integer> floorsUp;
-    private TreeSet<Integer> floorsDown;
+    private List<Integer> floorsToVisit;
 
     private static final Integer FLOOR_TRAVEL_TIME = 10;
     
@@ -22,37 +24,43 @@ public class Elevator {
         }
         this.startFloor = startFloor;
 
-        this.floorsToVisit = new HashSet<>();
+        this.floorsToVisit = new ArrayList<>();
+
+        Set<Integer> floorsSet = new HashSet<>();
         for( String floor: floors) {
             if( Integer.parseInt(floor) < 1) {
                 throw new IllegalArgumentException("Floors numbers must be 1 or greater");
             }
-            this.floorsToVisit.add(new Integer(floor));
+            floorsSet.add(new Integer(floor));
         }
 
         // sort the floors out into two sets
-        this.sortFloors();
+        this.sortFloors(floorsSet);
     }
 
-    private void sortFloors() {
+    private void sortFloors( Set<Integer> floorsSet ) {
 
-        this.floorsUp = new HashSet<>();
-        this.floorsDown = new TreeSet<>();
+        HashSet<Integer> floorsUp = new HashSet<>();
+        TreeSet<Integer> floorsDown = new TreeSet<>();
 
-        this.floorsUp.add(this.startFloor);
+        floorsUp.add(this.startFloor);
 
         // divide the floors into two sets
         // 1. floors above the start floor
         // 2. floors below the start floor
         // The sets are automatically sorted from small to large, so the floorsDown will need to be reversed
-        this.floorsToVisit.forEach(floor -> {
+        floorsSet.forEach(floor -> {
             if( floor >= this.startFloor) {
-                this.floorsUp.add(floor);
+                floorsUp.add(floor);
             } else {
-                this.floorsDown.add(floor);
+                floorsDown.add(floor);
             }
         });
 
+        this.floorsToVisit.clear();
+
+        floorsUp.forEach(floor -> this.floorsToVisit.add(floor));
+        floorsDown.descendingSet().forEach(floor -> this.floorsToVisit.add(floor));
 
     }
 
@@ -62,11 +70,7 @@ public class Elevator {
         StringBuilder builder = new StringBuilder();
         builder.append("floors visited in order: [");
 
-        this.floorsUp.forEach(floor -> {
-            builder.append( String.format( "%s , ", floor));
-        });
-
-        this.floorsDown.descendingSet().forEach(floor -> {
+        this.floorsToVisit.forEach(floor -> {
             builder.append( String.format( "%s , ", floor));
         });
 
@@ -77,19 +81,14 @@ public class Elevator {
         System.out.println( String.format( "total travel time: %s" , this.calculateTravelTime()));
     }
 
-    private Integer calculateTravelTime() {
+    public Integer calculateTravelTime() {
         Integer travelTime = Integer.valueOf(0);
 
         // calculate the travel time going to the up floors first,
         // then calculate the travel time going down the floors
         Integer lastFloor = this.startFloor;
-        for( Integer currentFloor: this.floorsUp ){
-            travelTime += (currentFloor - lastFloor);
-            lastFloor = currentFloor;
-        }
-
-        for( Integer currentFloor: this.floorsDown.descendingSet() ){
-            travelTime += (lastFloor - currentFloor);
+        for( Integer currentFloor: this.floorsToVisit ){
+            travelTime += Math.abs( currentFloor - lastFloor);
             lastFloor = currentFloor;
         }
 
