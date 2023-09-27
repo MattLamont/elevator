@@ -27,8 +27,12 @@ Provide code that simulates an elevator. You are free to use any language (Java 
 
 * How to run the program
 ```
+# To compile and run tests, then run exe
 mvn clean package
 java -jar target/elevator-1.0-SNAPSHOT-jar-with-dependencies.jar --start=5 --floor=1,2,3
+
+# Or just run includeded jar exe file
+java -jar target/elevator-1.0-SNAPSHOT-jar-with-dependencies.jar --start=5 --floor=5,8,6,1,7,3,4
 ```
 
 ## Unimplemented Features
