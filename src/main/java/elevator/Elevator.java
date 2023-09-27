@@ -26,6 +26,7 @@ public class Elevator {
 
         this.floorsToVisit = new ArrayList<>();
 
+        // put the sequence of floors into a set to remove any dupes
         Set<Integer> floorsSet = new HashSet<>();
         for( String floor: floors) {
             if( Integer.parseInt(floor) < 1) {
@@ -34,7 +35,7 @@ public class Elevator {
             floorsSet.add(new Integer(floor));
         }
 
-        // sort the floors out into two sets
+        // sort the floors out into two sets for up and down and recombine
         this.sortFloors(floorsSet);
     }
 
